@@ -1,46 +1,41 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-let request = require('request');
+const axios = require('axios');
 const apiUrl = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed/?url=https://habr.com/'
-
+const cors = require('cors');
 
 const app = express();
+
+app.use(cors());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }))
 
-app.get('/', (res, req, next) => {
-    request(apiUrl, function (error, response, body) {
-            if (!error && response.statusCode === 200) {
-                let jsonArray = JSON.parse(body).lighthouseResult.audits;
-                
-                // let jsonArray = JSON.parse(tmpArray);
-                
-                // let i = 0;
-                // for (var key in jsonArray) {
 
-                //     console.log(`${i}) => key: ${key}\n value: ${jsonArray[str].title}\n`);
-                //     i++;
-                // }
+app.get('/get_data', cors(), async (req, res) => {
+    let fetchedData = new Object();
+    try {
+        const dataReq = await axios.get(apiUrl);
+        const jsonArray = dataReq.data.lighthouseResult.audits;
+        
+        console.log(`Array from request:`+jsonArray);
 
-                let j = 0;
-                for (let key in jsonArray) {
-                    const tmpJson = jsonArray[key];
-                    if (tmpJson.details && tmpJson.details['type'] === 'opportunity') {
-                        // console.log(`${j}) Obj: ${tmpJson.details['overallSavingsMs']}\n`);
-                        console.log(`${j}) res: name= ${tmpJson.title}, savings= ${tmpJson.details.overallSavingsMs};`);
-                        j++;
-                    }
-                    
-                    // if (jsonArray[key].details[] === 'opportunity') {
-                    //     console.log(jsonArray[key].title);
-                        
-                    // }
-                }
-                console.log(jsonArray);
-            } 
-        });
-   
+        let j = 0;
+        for (let key in jsonArray) {
+            const tmpJson = jsonArray[key];
+            console.log(tmpJson);
+            if (tmpJson.details && tmpJson.details['type'] === 'opportunity' && typeof tmpJson.displayValue !== 'undefined') {
+                fetchedData[j] = {"title" : tmpJson.title, "savings" : tmpJson.details.overallSavingsMs, "score" : tmpJson.score, "displayValue" : tmpJson.displayValue};
+                // console.log(fetchedData[j]);
+                j++;
+            }
+        }
+        console.log(`Sum= ${j}`);
+        res.send(fetchedData);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send(`Oopps..!`);
+    }
 });
 
 const port = process.env.port || 5000;
