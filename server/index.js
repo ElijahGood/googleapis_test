@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 
 app.get('/get_data', cors(), async (req, res) => {
-    let fetchedData = new Object();
+    let fetchedData = [];//was like: new Object();
     try {
         const dataReq = await axios.get(apiUrl);
         const jsonArray = dataReq.data.lighthouseResult.audits;

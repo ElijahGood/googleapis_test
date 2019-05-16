@@ -7,6 +7,7 @@
 
 <script>
 import DataComponent from './components/DataComponent.vue'
+import 'vuetify/dist/vuetify.min.css'
 
 export default {
   name: 'app',
