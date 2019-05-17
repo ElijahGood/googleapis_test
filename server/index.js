@@ -13,24 +13,23 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 
 app.get('/get_data', cors(), async (req, res) => {
-    let fetchedData = [];//was like: new Object();
+    let fetchedData = [];
     try {
         const dataReq = await axios.get(apiUrl);
         const jsonArray = dataReq.data.lighthouseResult.audits;
-        
-        console.log(`Array from request:`+jsonArray);
-
         let j = 0;
         for (let key in jsonArray) {
             const tmpJson = jsonArray[key];
-            console.log(tmpJson);
             if (tmpJson.details && tmpJson.details['type'] === 'opportunity' && typeof tmpJson.displayValue !== 'undefined') {
-                fetchedData[j] = {"title" : tmpJson.title, "savings" : tmpJson.details.overallSavingsMs, "score" : tmpJson.score, "displayValue" : tmpJson.displayValue};
-                // console.log(fetchedData[j]);
+                fetchedData[j] = {
+                    "title" : tmpJson.title,
+                    "savings" : tmpJson.details.overallSavingsMs,
+                    "score" : (100 - parseFloat(tmpJson.score) * 100),
+                    "displayValue" : tmpJson.displayValue
+                };
                 j++;
             }
         }
-        console.log(`Sum= ${j}`);
         res.send(fetchedData);
     } catch (error) {
         console.error(error);

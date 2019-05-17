@@ -1,4 +1,5 @@
 <template>
+<!-- <v-app> -->
   <div id="container">
     <h1>SpeedTest</h1>
     <p class="error" v-if="error">{{ error }}</p>
@@ -24,7 +25,6 @@
       hide-actions
       class="elevation-1"
     >
-     <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
       <template slot="headerCell" slot-scope="props">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
@@ -40,7 +40,10 @@
        <template v-slot:items="props">
         <td>{{ props.index }}</td>
         <td class="text-xs-left">{{ props.item.title }}</td>
-        <td class="text-xs-right">{{ (parseFloat(props.item.savings)  / 1000).toFixed(2) + ` s (${props.item.displayValue})` }}</td>
+        <td class="text-xs-right">
+          {{ (parseFloat(props.item.savings)  / 1000).toFixed(2) + ` s (${props.item.displayValue})` }}
+          <v-progress-linear  color="red" height="5" :width="2" :value="props.item.score"></v-progress-linear>
+        </td>
       </template>
       <template v-slot:no-data>
         <v-alert :value="true" color="error" icon="warning">
@@ -54,6 +57,7 @@
       <div>&copy; {{ `inazarin ` + new Date().getFullYear() }}</div>
     </v-footer>
   </div>
+<!-- </v-app> -->
 </template>
 
 <script>
@@ -187,7 +191,7 @@ export default {
 /* original layout */
 #container {
   text-align: center;
-  padding: 20px;
+  padding: 10px;
 	margin: auto;
 }
 
@@ -198,7 +202,6 @@ table.opportunity-results{
   padding: 0;
   width: 100%;
   table-layout: fixed;
- 
 }
 
 table thead tr {
